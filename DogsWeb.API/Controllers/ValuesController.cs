@@ -11,7 +11,7 @@ namespace DogsWeb.API.Controllers
     // http:localhost:5000/api/values [controller] = ValueController class ignoruje Controller sam Values
     [Route("api/[controller]")]
     [ApiController]
-    public class ValuesController : ControllerBase
+    public class ValuesController : ControllerBase // ControllerBase  -> bez widoku z mvc mamy to z angulara
     {
         private readonly DataContext _context; // _ dla private
         public ValuesController(DataContext context)
