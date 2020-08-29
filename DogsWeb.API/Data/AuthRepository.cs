@@ -76,6 +76,7 @@ namespace DogsWeb.API.Data
         
         public async Task<User> ResetPassword(User user, string password)
         {
+            
             byte[] passwordHash, passwordSalt;
             CreatePasswordHash(password, out passwordHash, out passwordSalt);
 

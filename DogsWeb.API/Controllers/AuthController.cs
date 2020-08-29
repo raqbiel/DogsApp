@@ -7,12 +7,14 @@ using AutoMapper;
 using DogsWeb.API.Data;
 using DogsWeb.API.Dtos;
 using DogsWeb.API.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace DogsWeb.API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
@@ -101,12 +103,13 @@ namespace DogsWeb.API.Controllers
             if(userToReset == null)
                 return Unauthorized();
 
-            userToReset = _mapper.Map(userForLogin, userToReset);
-            var resetedUser = await _repo.ResetPassword(userToReset, userForLogin.Password);
+            if(userForLogin.Password.Length >= 4 ){
+                userToReset = _mapper.Map(userForLogin, userToReset);
+                var resetedUser = await _repo.ResetPassword(userToReset, userForLogin.Password);
            
-        
-         return StatusCode(201);
-      
+                return StatusCode(201,"Hasło zmienione poprawnie");
+        }
+          return BadRequest("Zle wpisane informacje");
     }
 
 
