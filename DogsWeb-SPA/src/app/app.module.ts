@@ -1,3 +1,4 @@
+import { ErrorInterceptorProvider } from './_services/error.interceptor';
 import { AuthService } from './_services/auth.service';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
@@ -16,11 +17,11 @@ import { HomeComponent } from './home/home.component';
 import { RegisterComponent } from './register/register.component';
 
 @NgModule({
-  declarations: [		
+  declarations: [
     AppComponent,
     NavbarComponent,
-      HomeComponent,
-      RegisterComponent
+    HomeComponent,
+    RegisterComponent
    ],
   imports: [
     MatFormFieldModule,
@@ -35,7 +36,7 @@ import { RegisterComponent } from './register/register.component';
 
   ],
   providers: [
-    AuthService
+    ErrorInterceptorProvider
   ],
   bootstrap: [AppComponent]
 })

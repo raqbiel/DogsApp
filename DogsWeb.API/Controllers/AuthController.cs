@@ -14,6 +14,7 @@ using DogsWeb.API.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -32,15 +33,16 @@ namespace DogsWeb.API.Controllers
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signManager;
-        private readonly AppSettings _appSettings;
-        private IEmailSender _emailsender;
 
-        public AuthController(IConfiguration config, IMapper mapper, UserManager<ApplicationUser> userManager, 
-        SignInManager<ApplicationUser> signInManager,IOptions<AppSettings> appSettings, IEmailSender emailsender)
+        private IEmailSender _emailsender;
+        private readonly ApplicationDbContext _context;
+
+        public AuthController(IConfiguration config, IMapper mapper, UserManager<ApplicationUser> userManager,
+        ApplicationDbContext context, IEmailSender emailsender)
         {
-            _userManager = userManager; 
-            _signManager = signInManager;
-            _appSettings = appSettings.Value;
+
+            _userManager = userManager;
+            _context = context;
             _emailsender = emailsender;
             _config = config;
             _mapper = mapper;
@@ -54,38 +56,41 @@ namespace DogsWeb.API.Controllers
 
 
         }
+    
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(/*[FromBody]*/UserForRegister userForRegister)
         { //[FromBody] zamiast [ApiController]
-           
+
             List<string> errorList = new List<string>();
             //uzytkownik logowanie z malej litery aby uniknac duplikatu J i j . User bedzie mogl sie logowac zarowno z J jak i j.
-           // userForRegister.Username = userForRegister.Username.ToLower();
+           
+            
+            userForRegister.Username = userForRegister.Username.ToLower();
 
             var userToCreate = new ApplicationUser
             {
-                
+
                 Email = userForRegister.Email,
                 UserName = userForRegister.Username,
                 SecurityStamp = Guid.NewGuid().ToString()
-                
+
             };
 
             //var createdUser = await _repo.Register(userToCreate, userForRegister.Password);
             var result = await _userManager.CreateAsync(userToCreate, userForRegister.Password);
             if (result.Succeeded)
             {
-            
-               //  await _userManager.AddToRoleAsync(userToCreate, "Customer");
+
+                //  await _userManager.AddToRoleAsync(userToCreate, "Customer");
 
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(userToCreate);
-            
-                string callbackUrl = Url.Action("ConfirmEmail", "Auth", new {UserId = userToCreate.Id, Code = code }, protocol: HttpContext.Request.Scheme);
-                await _emailsender.SendEmailAsync(userToCreate.Email, "Techhowdy.com - Confirm Your Email", "Please confirm your e-mail by clicking this link:  <a href=\"" + callbackUrl + "\">click here</a>");
-                return Ok(new { username = userToCreate.UserName,email = userToCreate.Email, status = 1, message = "Registration Successful" });
+
+                string callbackUrl = Url.Action("ConfirmEmail", "Auth", new { UserId = userToCreate.Id, Code = code }, protocol: HttpContext.Request.Scheme);
+                await _emailsender.SendEmailAsync(userToCreate.Email, "Dogs Meeting - Potwierdź adres email", "Potwierdź swój adres e-mail, klikając ten link:  <a href=\"" + callbackUrl + "\">LINK</a>");
+                return Ok(new { username = userToCreate.UserName, email = userToCreate.Email, status = 1, message = "Rejestracja zakończona sukcesem" });
             }
-            else 
+            else
             {
                 foreach (var error in result.Errors)
                 {
@@ -97,25 +102,26 @@ namespace DogsWeb.API.Controllers
             return BadRequest(new JsonResult(errorList));
 
         }
- // Login Method
+        // Login Method
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] UserForLogin userForLogin) 
+        public async Task<IActionResult> Login([FromBody] UserForLogin userForLogin)
         {
+           
             // Get the User from Database
             var user = await _userManager.FindByNameAsync(userForLogin.Username);
 
             //var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_appSettings.Secret));
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:Token").Value)); // utworzenie klucza zebezpieczen
 
-            if (user != null &&  await _userManager.CheckPasswordAsync(user, userForLogin.Password))
+            if (user != null && await _userManager.CheckPasswordAsync(user, userForLogin.Password))
             {
-        
+
                 // THen Check If Email Is confirmed
                 if (!await _userManager.IsEmailConfirmedAsync(user))
                 {
-                    ModelState.AddModelError(string.Empty, "User Has not Confirmed Email.");
+                    ModelState.AddModelError(string.Empty, "Użytkownik nie potwierdził adresu e-mail.");
 
-                    return Unauthorized(new { LoginError = "We sent you an Confirmation Email. Please Confirm Your Registration With Techhowdy.com To Log in." });
+                    return Unauthorized(new { LoginError = "Wysłaliśmy Ci e-mail potwierdzający. Potwierdź swoją rejestrację w DogsWeb, aby się zalogować." });
                 }
 
                 // get user Role
@@ -142,23 +148,23 @@ namespace DogsWeb.API.Controllers
 
                 var token = tokenHandler.CreateToken(tokenDescriptor);
 
-                return Ok(new {token = tokenHandler.WriteToken(token), expiration = token.ValidTo, username = user.UserName});
+                return Ok(new { token = tokenHandler.WriteToken(token), expiration = token.ValidTo, username = user.UserName });
 
             }
 
             // return error
-            ModelState.AddModelError("", "Username/Password was not Found");
-            return Unauthorized(new { LoginError = "Please Check the Login Credentials - Ivalid Username/Password was entered" });
+            ModelState.AddModelError("", "Nie znaleziono użytkownika/hasła");
+            return Unauthorized(new { LoginError = "Sprawdź dane logowania - wprowadzono nieprawidłową nazwę użytkownika / hasło" });
 
         }
 
         [HttpGet("[action]")]
         [AllowAnonymous]
-        public async Task<IActionResult> ConfirmEmail(string userId, string code) 
+        public async Task<IActionResult> ConfirmEmail(string userId, string code)
         {
             if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(code))
             {
-                ModelState.AddModelError("", "User Id and Code are required");
+                ModelState.AddModelError("", "Wymagany userId oraz kod");
                 return BadRequest(ModelState);
 
             }
@@ -170,16 +176,16 @@ namespace DogsWeb.API.Controllers
                 return new JsonResult("ERROR");
             }
 
-         
+
             var result = await _userManager.ConfirmEmailAsync(user, code);
 
             if (result.Succeeded)
             {
 
-               return Redirect("http://localhost:4200");
+                return Redirect("http://localhost:4200");
 
             }
-            else 
+            else
             {
                 List<string> errors = new List<string>();
                 foreach (var error in result.Errors)
@@ -192,6 +198,6 @@ namespace DogsWeb.API.Controllers
 
         }
 
-       
+
     }
 }

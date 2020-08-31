@@ -9,13 +9,7 @@ namespace DogsWeb.API.Services
 {
   public class SendGridEmailSender : IEmailSender
     {
-        private readonly AppSettings _appSettings;
-
-        public SendGridEmailSender(IOptions<AppSettings> appSettings)
-        {
-            _appSettings = appSettings.Value;
-        }
-
+    
 
         public async Task<SendEmailResponse> SendEmailAsync(string userEmail, string emailSubject, string message) 
         {

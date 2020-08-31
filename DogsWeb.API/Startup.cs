@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -12,8 +13,9 @@ using DogsWeb.API.Models;
 using DogsWeb.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -43,14 +45,14 @@ namespace DogsWeb.API
             services.AddControllers();
             services.AddCors();
            
-          services.AddIdentity<ApplicationUser, IdentityRole>(options => {
+            services.AddIdentity<ApplicationUser, IdentityRole>(options => {
                 options.Tokens.PasswordResetTokenProvider = TokenOptions.DefaultEmailProvider;
                 options.Tokens.EmailConfirmationTokenProvider = TokenOptions.DefaultEmailProvider;
                 options.User.RequireUniqueEmail = true;
                 }).AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
              services.AddScoped<IEmailSender, SendGridEmailSender>();
-            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
              services.AddSendGridEmailSender();
 
               // Specifiying we are going to use Identity Framework
@@ -65,16 +67,33 @@ namespace DogsWeb.API
             {
                 app.UseDeveloperExceptionPage();
             }
+            else 
+            {
+                app.UseExceptionHandler(builder => 
+                {
+                    builder.Run(async context => 
+                    {
+                        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
+                        var error = context.Features.Get<IExceptionHandlerFeature>();
+                       
+                            context.Response.AddApplicationError(error.Error.Message);
+                            await context.Response.WriteAsync(error.Error.Message);
+                        
+                    });
+                });
+            }
             // app.UseHttpsRedirection();
-
+           
             app.UseRouting();
 
-            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
             app.UseAuthentication();
             app.UseAuthorization();
+            
+            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+
+            app.UseStaticFiles();
+         
 
             app.UseEndpoints(endpoints =>
             {

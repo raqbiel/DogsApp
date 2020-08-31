@@ -15,5 +15,6 @@ namespace DogsWeb.API.Dtos
         [Required (ErrorMessage= "Password pole jest wymagane")]
         [StringLength(20, MinimumLength = 4, ErrorMessage= "Musisz podać hasło o długości od 4 do 20 znaków")]
         public string Password { get; set; }
+        public string Firstname { get; set; }
     }
 }
