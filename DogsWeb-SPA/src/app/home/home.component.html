@@ -1,0 +1,18 @@
+<div class="container mt-5">
+  <div *ngIf="!registerMode" style="text-align: center">
+    <h1>Dogs Meeting</h1>
+    <p class="lead">Znajdź przyjaciół dla Twojego zwierzaka. Wszystko co potrzebujesz to rejestracja!</p>
+    <div class="text-center">
+      <button class="btn btn-primary btn-lg mr-2" (click)="registerToggle()" >Rejestracja</button>
+      <button class="btn btn-info btn-lg">Czytaj więcej</button>
+    </div>
+  </div>
+
+  <div class="container" *ngIf="registerMode">
+    <div class="row justify-content-center">
+      <div class="col-4">
+        <app-register (cancelRegister)="cancelRegisterMode($event)"></app-register> <!-- (cancelRegister) od componentu home -->
+      </div>
+    </div>
+  </div>
+</div>

@@ -4,6 +4,11 @@ namespace DogsWeb.API.Dtos
 {
     public class UserForRegister
     {
+
+        [Required (ErrorMessage= "Email pole jest wymagane")]
+        [EmailAddress]
+        public string Email { get; set; }
+        
         [Required (ErrorMessage= "Username pole jest wymagane")]
         public string Username { get; set; }
 
