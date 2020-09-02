@@ -16,6 +16,10 @@ import {MatInputModule} from '@angular/material/input';
 import { HomeComponent } from './home/home.component';
 import { RegisterComponent } from './register/register.component';
 
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { SimpleNotificationsModule } from 'angular2-notifications';
+import { PushNotificationsModule } from 'ng-push-ivy';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -32,11 +36,16 @@ import { RegisterComponent } from './register/register.component';
     HttpClientModule,
     FormsModule,
     BrowserAnimationsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    BsDropdownModule.forRoot(),
+    SimpleNotificationsModule.forRoot(),
+    PushNotificationsModule
 
   ],
   providers: [
     ErrorInterceptorProvider
+
+
   ],
   bootstrap: [AppComponent]
 })

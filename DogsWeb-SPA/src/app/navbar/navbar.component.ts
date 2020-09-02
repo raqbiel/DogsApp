@@ -1,3 +1,4 @@
+import { AlertsService } from './../_services/alerts.service';
 import { AuthService } from '../_services/auth.service';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
@@ -16,28 +17,28 @@ export class NavbarComponent implements OnInit {
   err: any = {};
 
 
-  constructor(private authService: AuthService) { }
+  constructor(public authService: AuthService, private alerts: AlertsService) { }
 
   ngOnInit(): void {
-    console.log(this.err.toString());
+
   }
 
   login(){
    this.authService.login(this.model).subscribe(next => {
-      console.log('Logged successfully!');
+      this.alerts.onSuccess('Zalogowany! Witaj ' + this.model.username);
    }, err => {
-     console.log('Failed login', err);
+     this.alerts.onError(err);
+     console.log(err);
    });
   }
 
   loggedIn(){
-    const token = localStorage.getItem('token');
-    return !!token; // jeżeli cos zwróci to true, puste to false
+   return this.authService.loggedIn();
   }
 
   logout(){
     localStorage.removeItem('token');
-    console.log('Logout');
+    this.alerts.onInfo('Nastąpiło wylogowanie');
   }
 
 }

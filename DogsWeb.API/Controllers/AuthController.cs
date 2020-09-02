@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,60 +31,38 @@ namespace DogsWeb.API.Controllers
     public class AuthController : Controller
     {
         private readonly IConfiguration _config;
-        private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signManager;
 
         private IEmailSender _emailsender;
-        private readonly ApplicationDbContext _context;
 
-        public AuthController(IConfiguration config, IMapper mapper, UserManager<ApplicationUser> userManager,
-        ApplicationDbContext context, IEmailSender emailsender)
+        public AuthController(IConfiguration config, UserManager<ApplicationUser> userManager, IEmailSender emailsender)
         {
 
             _userManager = userManager;
-            _context = context;
             _emailsender = emailsender;
             _config = config;
-            _mapper = mapper;
-
-            // var conf = new MapperConfiguration(cfg =>
-            // {
-            //     cfg.CreateMap<UserForLogin, User>();
-            // });
-
-            // _mapper = conf.CreateMapper();
-
 
         }
     
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(/*[FromBody]*/UserForRegister userForRegister)
-        { //[FromBody] zamiast [ApiController]
+        public async Task<IActionResult> Register([FromBody]UserForRegister userForRegister)
+        { 
 
             List<string> errorList = new List<string>();
-            //uzytkownik logowanie z malej litery aby uniknac duplikatu J i j . User bedzie mogl sie logowac zarowno z J jak i j.
-           
-            
             userForRegister.Username = userForRegister.Username.ToLower();
 
             var userToCreate = new ApplicationUser
             {
-
-                Email = userForRegister.Email,
                 UserName = userForRegister.Username,
+                Email = userForRegister.Email,
                 SecurityStamp = Guid.NewGuid().ToString()
 
             };
 
-            //var createdUser = await _repo.Register(userToCreate, userForRegister.Password);
             var result = await _userManager.CreateAsync(userToCreate, userForRegister.Password);
             if (result.Succeeded)
             {
-
-                //  await _userManager.AddToRoleAsync(userToCreate, "Customer");
-
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(userToCreate);
 
                 string callbackUrl = Url.Action("ConfirmEmail", "Auth", new { UserId = userToCreate.Id, Code = code }, protocol: HttpContext.Request.Scheme);
@@ -98,15 +77,13 @@ namespace DogsWeb.API.Controllers
                     errorList.Add(error.Description);
                 }
             }
-
             return BadRequest(new JsonResult(errorList));
 
         }
-        // Login Method
+        // Login Metoda
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserForLogin userForLogin)
         {
-           
             // Get the User from Database
             var user = await _userManager.FindByNameAsync(userForLogin.Username);
 
@@ -116,19 +93,15 @@ namespace DogsWeb.API.Controllers
             if (user != null && await _userManager.CheckPasswordAsync(user, userForLogin.Password))
             {
 
-                // THen Check If Email Is confirmed
+                // Sprawdz czy email został potwierdzony
                 if (!await _userManager.IsEmailConfirmedAsync(user))
                 {
                     ModelState.AddModelError(string.Empty, "Użytkownik nie potwierdził adresu e-mail.");
 
-                    return Unauthorized(new { LoginError = "Wysłaliśmy Ci e-mail potwierdzający. Potwierdź swoją rejestrację w DogsWeb, aby się zalogować." });
+                    return Unauthorized("Wysłaliśmy Ci e-mail potwierdzający. Potwierdź swoją rejestrację w DogsWeb, aby się zalogować.");
                 }
 
-                // get user Role
-                //var roles = await _userManager.GetRolesAsync(user);
-
                 var tokenHandler = new JwtSecurityTokenHandler();
-
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
                     Subject = new ClaimsIdentity(new Claim[]
@@ -143,18 +116,13 @@ namespace DogsWeb.API.Controllers
                     SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature),
                     Expires = DateTime.Now.AddDays(1)
                 };
-
-                // Generate Token
-
+                // Generowanie tokenu
                 var token = tokenHandler.CreateToken(tokenDescriptor);
-
                 return Ok(new { token = tokenHandler.WriteToken(token), expiration = token.ValidTo, username = user.UserName });
 
             }
-
-            // return error
             ModelState.AddModelError("", "Nie znaleziono użytkownika/hasła");
-            return Unauthorized(new { LoginError = "Sprawdź dane logowania - wprowadzono nieprawidłową nazwę użytkownika / hasło" });
+            return Unauthorized("Sprawdź dane logowania - wprowadzono nieprawidłową nazwę użytkownika / hasło");
 
         }
 
@@ -166,7 +134,6 @@ namespace DogsWeb.API.Controllers
             {
                 ModelState.AddModelError("", "Wymagany userId oraz kod");
                 return BadRequest(ModelState);
-
             }
 
             var user = await _userManager.FindByIdAsync(userId);
@@ -176,13 +143,17 @@ namespace DogsWeb.API.Controllers
                 return new JsonResult("ERROR");
             }
 
+           if (user.EmailConfirmed)
+            {
+                return Redirect("http://localhost:4200");
+            }
 
-            var result = await _userManager.ConfirmEmailAsync(user, code);
+              var result = await _userManager.ConfirmEmailAsync(user, code);
 
             if (result.Succeeded)
             {
 
-                return Redirect("http://localhost:4200");
+                return RedirectToAction("EmailConfirmed", "Auth", new { userId, code });
 
             }
             else
@@ -194,10 +165,15 @@ namespace DogsWeb.API.Controllers
                 }
                 return new JsonResult(errors);
             }
-
-
         }
-
-
+         public IActionResult EmailConfirmed(string userId, string code) 
+        {
+            if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(code))
+            {
+                return Redirect("http://localhost:4200");
+            }
+            return View();
+         }
+      
     }
 }

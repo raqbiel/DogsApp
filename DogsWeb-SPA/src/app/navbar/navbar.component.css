@@ -18,3 +18,7 @@ input.example-right-align::-webkit-inner-spin-button {
 input.example-right-align {
   -moz-appearance: textfield;
 }
+.dropdown-toggle, .dropdown-item, .dropdown-toggle:hover{
+  cursor: pointer;
+  text-decoration:  none;
+}

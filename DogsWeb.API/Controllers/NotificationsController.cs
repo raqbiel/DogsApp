@@ -9,10 +9,7 @@ namespace DogsWeb.API.Controllers
             if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(code))
             {
                 return Redirect("http://localhost:4200");
-
             }
-
-
             return View();
          }
     }

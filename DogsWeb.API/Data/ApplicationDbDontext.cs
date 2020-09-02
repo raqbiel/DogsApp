@@ -11,11 +11,6 @@ namespace DogsWeb.API.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
-
-        // Creatin Roles for or application
-
-       
-
         public DbSet<ApplicationUser> User { get; set; }
 
 

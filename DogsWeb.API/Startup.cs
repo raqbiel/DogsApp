@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -44,18 +45,21 @@ namespace DogsWeb.API
             services.AddDbContext<ApplicationDbContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
             services.AddControllers();
             services.AddCors();
-           
-            services.AddIdentity<ApplicationUser, IdentityRole>(options => {
+            services.AddMvc(opt => opt.EnableEndpointRouting = false);
+          // services.AddMvcCore(options => options.EnableEndpointRouting = false).AddRazorViewEngine();
+          services.AddIdentity<ApplicationUser, IdentityRole>(options => {
                 options.Tokens.PasswordResetTokenProvider = TokenOptions.DefaultEmailProvider;
                 options.Tokens.EmailConfirmationTokenProvider = TokenOptions.DefaultEmailProvider;
                 options.User.RequireUniqueEmail = true;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.AllowedForNewUsers = true;
                 }).AddDefaultTokenProviders()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddErrorDescriber<CustomErrorDescriber>();
              services.AddScoped<IEmailSender, SendGridEmailSender>();
              services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
              services.AddSendGridEmailSender();
-
-              // Specifiying we are going to use Identity Framework
           
             
         }
@@ -63,6 +67,7 @@ namespace DogsWeb.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+           
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -83,17 +88,16 @@ namespace DogsWeb.API
                     });
                 });
             }
+
             // app.UseHttpsRedirection();
-           
+
             app.UseRouting();
 
+            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
             app.UseAuthentication();
             app.UseAuthorization();
-            
-            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
-
-            app.UseStaticFiles();
-         
 
             app.UseEndpoints(endpoints =>
             {
