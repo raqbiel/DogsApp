@@ -11,6 +11,9 @@ export class AuthService {
 baseUrl = 'http://localhost:5000/api/auth/';
 jwtHelper = new JwtHelperService();
 decodedToken: any;
+token: any;
+emailuser: any;
+passReset = false;
 
 constructor(private http: HttpClient) { }
 
@@ -34,9 +37,41 @@ login(model: any){
 register(model: any){
   return this.http.post(this.baseUrl + 'register', model);
 }
+resetpassword(model: any, token: any){
+  return this.http.post(this.baseUrl + 'resetpassword?Email=' + this.emailuser + "&Token=" + this.token, model);
+
+}
+
+forgotpassword(model: any){
+  return this.http.post(this.baseUrl + 'forgotpassword', model)
+    .pipe(
+      map((response: any) => {
+        const user = response;
+        console.log(response);
+        // tslint:disable-next-line: forin
+        this.emailuser = response["email"];
+        for (const key in response){
+           this.token = response[key];
+           const element = response[key];
+           console.log(element);
+           console.log(this.emailuser);
+
+
+
+       }// console.log(model);
+       this.passReset = true;
+
+      })
+    );
+}
+
+resetedPassword(){
+  this.passReset = true;
+}
 
 loggedIn(){
   const token = localStorage.getItem('token');
   return !this.jwtHelper.isTokenExpired(token);
 }
 }
+

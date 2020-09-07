@@ -1,3 +1,5 @@
+import { appRoutes } from './routes';
+import { Routes, RouterModule } from '@angular/router';
 import { ErrorInterceptorProvider } from './_services/error.interceptor';
 import { AuthService } from './_services/auth.service';
 import { BrowserModule } from '@angular/platform-browser';
@@ -19,13 +21,24 @@ import { RegisterComponent } from './register/register.component';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { SimpleNotificationsModule } from 'angular2-notifications';
 import { PushNotificationsModule } from 'ng-push-ivy';
+import { ResetPasswordComponent } from './resetPassword/resetPassword.component';
+import { ForgotPasswordComponent } from './forgotPassword/forgotPassword.component';
+import { DogsListComponent } from './dogs-list/dogs-list.component';
+import { ListsComponent } from './lists/lists.component';
+import { MessagesComponent } from './messages/messages.component';
+
 
 @NgModule({
   declarations: [
     AppComponent,
     NavbarComponent,
     HomeComponent,
-    RegisterComponent
+    RegisterComponent,
+      ResetPasswordComponent,
+      ForgotPasswordComponent,
+      DogsListComponent,
+      ListsComponent,
+      MessagesComponent
    ],
   imports: [
     MatFormFieldModule,
@@ -39,11 +52,13 @@ import { PushNotificationsModule } from 'ng-push-ivy';
     ReactiveFormsModule,
     BsDropdownModule.forRoot(),
     SimpleNotificationsModule.forRoot(),
-    PushNotificationsModule
+    PushNotificationsModule,
+    RouterModule.forRoot(appRoutes)
 
   ],
   providers: [
-    ErrorInterceptorProvider
+    ErrorInterceptorProvider,
+
 
 
   ],

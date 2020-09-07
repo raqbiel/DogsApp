@@ -45,7 +45,11 @@ namespace DogsWeb.API
             services.AddDbContext<ApplicationDbContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
             services.AddControllers();
             services.AddCors();
-            services.AddMvc(opt => opt.EnableEndpointRouting = false);
+          services.AddMvc()
+    .AddJsonOptions(options =>
+    {               
+         options.JsonSerializerOptions.WriteIndented = true;    
+    });
           // services.AddMvcCore(options => options.EnableEndpointRouting = false).AddRazorViewEngine();
           services.AddIdentity<ApplicationUser, IdentityRole>(options => {
                 options.Tokens.PasswordResetTokenProvider = TokenOptions.DefaultEmailProvider;
@@ -94,7 +98,7 @@ namespace DogsWeb.API
             app.UseRouting();
 
             app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
-            app.UseHttpsRedirection();
+           
             app.UseStaticFiles();
             app.UseAuthentication();
             app.UseAuthorization();

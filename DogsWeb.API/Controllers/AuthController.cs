@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -27,6 +28,7 @@ namespace DogsWeb.API.Controllers
 {
 
     [Route("api/[controller]")]
+    [Produces("application/json")]
     [ApiController]
     public class AuthController : Controller
     {
@@ -48,7 +50,6 @@ namespace DogsWeb.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody]UserForRegister userForRegister)
         { 
-
             List<string> errorList = new List<string>();
             userForRegister.Username = userForRegister.Username.ToLower();
 
@@ -172,8 +173,90 @@ namespace DogsWeb.API.Controllers
             {
                 return Redirect("http://localhost:4200");
             }
-            return View();
+            return View("EmailConfirmed");
          }
-      
+
+        // [HttpGet("forgotpassword")]
+        // [AllowAnonymous]
+        // public IActionResult ForgotPassword()
+        // {
+        //     return View();
+        // }
+
+
+        [HttpPost("forgotpassword")]
+        public async Task<IActionResult> ForgotPassword(ApplicationUser model){
+            
+            if(string.IsNullOrWhiteSpace(model.Email) || model.Email == null){
+                  
+                    return Unauthorized("Podaj prawidłowy adres email");
+            }
+
+            if(ModelState.IsValid){
+                var user = await _userManager.FindByEmailAsync(model.Email);
+              
+                if (user != null && await _userManager.IsEmailConfirmedAsync(user)){
+
+                    var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+                    var passwordLinkReset = Url.Action("ResetPassword", "Auth", new {Email = user.Email, Token = token},  protocol: HttpContext.Request.Scheme);
+
+                    Console.Write(passwordLinkReset);
+                    await _emailsender.SendEmailAsync(user.Email, "Dogs Meeting - Reset hasła", "Zresetuj swóje hasło, podając kod: " + token);
+
+                    return Ok(new { Email = user.Email, Token = token});
+
+                }else if(user == null ){
+                        return Unauthorized("Brak adresu email w bazie");
+                     }
+                }
+                 return Unauthorized("Podaj prawidłowy adres email");
+             }
+
+// [HttpGet]
+// [AllowAnonymous]
+// public IActionResult ResetPassword(string token, string email)
+// {
+//     // If password reset token or email is null, most likely the
+//     // user tried to tamper the password reset link
+//     if (token == null || email == null)
+//     {
+//         ModelState.AddModelError("", "Nieprawidłowy token");
+//     }
+//     return View();
+// }
+      [HttpPost("resetpassword")]
+      [AllowAnonymous]
+     public async Task<IActionResult> ResetPassword(string token,ResetPasswordModel model)
+        {
+    if (ModelState.IsValid)
+    {
+        // Znajdz uzytkownika po adresie email
+        var user = await _userManager.FindByEmailAsync(model.Email);
+
+        if (user != null)
+        {
+            // reset hasła
+            var result = await _userManager.ResetPasswordAsync(user, token, model.Password);
+            if (result.Succeeded)
+            {
+                return Ok(new { User = user, Token = token });
+            }
+            // Display validation errors. For example, password reset token already
+            // used to change the password or password complexity rules not met
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError("", error.Description);
+            }
+              return Ok(new { Email = user.Email, Token = token});
+        }
+
+        // To avoid account enumeration and brute force attacks, don't
+        // reveal that the user does not exist
+        return View("ResetPasswordConfirmation");
     }
+    // Display validation errors if model state is not valid
+    return BadRequest("Zle wprowadzone dane");
+}
+}
 }

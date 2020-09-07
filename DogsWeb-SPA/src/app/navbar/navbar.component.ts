@@ -2,6 +2,7 @@ import { AlertsService } from './../_services/alerts.service';
 import { AuthService } from '../_services/auth.service';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
@@ -17,7 +18,7 @@ export class NavbarComponent implements OnInit {
   err: any = {};
 
 
-  constructor(public authService: AuthService, private alerts: AlertsService) { }
+  constructor(public authService: AuthService, private alerts: AlertsService, private router: Router) { }
 
   ngOnInit(): void {
 
@@ -25,10 +26,11 @@ export class NavbarComponent implements OnInit {
 
   login(){
    this.authService.login(this.model).subscribe(next => {
-      this.alerts.onSuccess('Zalogowany! Witaj ' + this.model.username);
+      this.alerts.onSuccess('Użytkownik zalogowany!');
    }, err => {
      this.alerts.onError(err);
-     console.log(err);
+   }, ()=> {
+     this.router.navigate(['/dopasowania']);
    });
   }
 
@@ -39,6 +41,7 @@ export class NavbarComponent implements OnInit {
   logout(){
     localStorage.removeItem('token');
     this.alerts.onInfo('Nastąpiło wylogowanie');
+    this.router.navigate(['/home']);
   }
 
 }

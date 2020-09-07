@@ -1,4 +1,4 @@
-<div class="container mt-5">
+<div class="container mt-5" *ngIf="!loggedIn()">
   <div *ngIf="!registerMode" style="text-align: center">
     <h1>Dogs Meeting</h1>
     <p class="lead">Znajdź przyjaciół dla Twojego zwierzaka. Wszystko co potrzebujesz to rejestracja!</p>
@@ -11,8 +11,17 @@
   <div class="container" *ngIf="registerMode">
     <div class="row justify-content-center">
       <div class="col-sm-4 col-12">
-        <app-register (cancelRegister)="cancelRegisterMode($event)"></app-register> <!-- (cancelRegister) od componentu home -->
+        <!-- <app-forgotPassword></app-forgotPassword> -->
+        <app-register (cancelRegister)="cancelRegisterMode($event)"></app-register>
+        <app-resetPassword [passwordReseted]="passwReseted"></app-resetPassword>
       </div>
     </div>
+  </div>
+</div>
+
+<div class="container mt-5" *ngIf="loggedIn()">
+  <div *ngIf="!registerMode" style="text-align: center">
+    <h1>Dogs Meeting</h1>
+    <p class="lead">Znajdź przyjaciół dla Twojego zwierzaka. Wszystko co potrzebujesz to rejestracja!</p>
   </div>
 </div>
