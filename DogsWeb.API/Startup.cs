@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -43,15 +44,26 @@ namespace DogsWeb.API
            
             
             services.AddDbContext<ApplicationDbContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(opt => 
+            {
+                opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            });
             services.AddCors();
-          services.AddMvc()
-    .AddJsonOptions(options =>
-    {               
-         options.JsonSerializerOptions.WriteIndented = true;    
-    });
-          // services.AddMvcCore(options => options.EnableEndpointRouting = false).AddRazorViewEngine();
-          services.AddIdentity<ApplicationUser, IdentityRole>(options => {
+            services.AddAutoMapper(typeof(DogsRepository).Assembly);
+            services.AddScoped<IDogsRepository, DogsRepository>();
+             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options => 
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII
+                            .GetBytes(Configuration.GetSection("AppSettings:Token").Value)),
+                        ValidateIssuer = false,
+                        ValidateAudience = false
+                    };
+                });
+            services.AddIdentity<ApplicationUser, IdentityRole>(options => {
                 options.Tokens.PasswordResetTokenProvider = TokenOptions.DefaultEmailProvider;
                 options.Tokens.EmailConfirmationTokenProvider = TokenOptions.DefaultEmailProvider;
                 options.User.RequireUniqueEmail = true;
@@ -61,10 +73,11 @@ namespace DogsWeb.API
                 }).AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddErrorDescriber<CustomErrorDescriber>();
+                
              services.AddScoped<IEmailSender, SendGridEmailSender>();
-             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            // services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
              services.AddSendGridEmailSender();
-          
+           
             
         }
 
@@ -93,20 +106,22 @@ namespace DogsWeb.API
                 });
             }
 
-            // app.UseHttpsRedirection();
-
             app.UseRouting();
 
-            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
-           
-            app.UseStaticFiles();
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+               
             });
+          
         }
     }
 }

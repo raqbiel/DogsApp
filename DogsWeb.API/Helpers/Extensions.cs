@@ -1,3 +1,4 @@
+using System;
 using System.Net;
 using Microsoft.AspNetCore.Http;
 
@@ -14,6 +15,14 @@ namespace DogsWeb.API.Helpers
             response.Headers.Add("Content-type", "application/json");
             
         
+        }
+        public static int CalculateAge(this DateTime theDateTime){
+
+            var age = DateTime.Today.Year - theDateTime.Year;
+            if(theDateTime.AddYears(age) > DateTime.Today)
+                    age--;
+
+            return age;
         }
     }
 }

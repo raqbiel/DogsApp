@@ -30,7 +30,7 @@ namespace DogsWeb.API.Controllers
     [Route("api/[controller]")]
     [Produces("application/json")]
     [ApiController]
-    public class AuthController : Controller
+    public class AuthController : ControllerBase
     {
         private readonly IConfiguration _config;
         private readonly UserManager<ApplicationUser> _userManager;
@@ -48,7 +48,7 @@ namespace DogsWeb.API.Controllers
     
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody]UserForRegister userForRegister)
+        public async Task<IActionResult> Register(/*[FromBody]*/UserForRegister userForRegister)
         { 
             List<string> errorList = new List<string>();
             userForRegister.Username = userForRegister.Username.ToLower();
@@ -83,11 +83,11 @@ namespace DogsWeb.API.Controllers
         }
         // Login Metoda
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] UserForLogin userForLogin)
+        public async Task<IActionResult> Login(/*[FromBody]*/ UserForLogin userForLogin)
         {
             // Get the User from Database
             var user = await _userManager.FindByNameAsync(userForLogin.Username);
-
+            //var lockOut = await _userManager.IsLockedOutAsync(user);
             //var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_appSettings.Secret));
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:Token").Value)); // utworzenie klucza zebezpieczen
 
@@ -122,9 +122,10 @@ namespace DogsWeb.API.Controllers
                 return Ok(new { token = tokenHandler.WriteToken(token), expiration = token.ValidTo, username = user.UserName });
 
             }
+           
             ModelState.AddModelError("", "Nie znaleziono użytkownika/hasła");
             return Unauthorized("Sprawdź dane logowania - wprowadzono nieprawidłową nazwę użytkownika / hasło");
-
+        
         }
 
         [HttpGet("[action]")]
@@ -173,7 +174,7 @@ namespace DogsWeb.API.Controllers
             {
                 return Redirect("http://localhost:4200");
             }
-            return View("EmailConfirmed");
+            return Redirect("http://localhost:4200/emailconfirm");
          }
 
         // [HttpGet("forgotpassword")]
@@ -227,7 +228,7 @@ namespace DogsWeb.API.Controllers
 // }
       [HttpPost("resetpassword")]
       [AllowAnonymous]
-     public async Task<IActionResult> ResetPassword(string token,ResetPasswordModel model)
+     public async Task<IActionResult> ResetPassword(string token, ResetPasswordModel model)
         {
     if (ModelState.IsValid)
     {
@@ -253,7 +254,7 @@ namespace DogsWeb.API.Controllers
 
         // To avoid account enumeration and brute force attacks, don't
         // reveal that the user does not exist
-        return View("ResetPasswordConfirmation");
+        return Redirect("http://localhost:4200/resetpasswordconfirm");
     }
     // Display validation errors if model state is not valid
     return BadRequest("Zle wprowadzone dane");

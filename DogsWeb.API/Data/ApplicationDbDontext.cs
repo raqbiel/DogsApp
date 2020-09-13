@@ -12,6 +12,7 @@ namespace DogsWeb.API.Data
         {
         }
         public DbSet<ApplicationUser> User { get; set; }
+        public DbSet<Photo> Photos {get; set;}
 
 
     }

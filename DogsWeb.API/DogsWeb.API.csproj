@@ -16,5 +16,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.7"/>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.7"/>
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.1.7"/>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.7"/>
   </ItemGroup>
 </Project>

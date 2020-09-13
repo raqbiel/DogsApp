@@ -16,7 +16,7 @@ namespace DogsWeb.API.Services
             
             var apiKey = "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";
             var client = new SendGridClient(apiKey);
-            var from = new EmailAddress("raqbiel@gmail.com", "TECHHOWDY.COM");
+            var from = new EmailAddress("raqbiel@gmail.com", "DogsWeb");
             var subject = emailSubject;
             var to = new EmailAddress(userEmail, "Test");
             var plainTextContent = message;

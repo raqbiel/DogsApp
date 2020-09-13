@@ -19,7 +19,7 @@ export class ForgotPasswordComponent implements OnInit {
   ngOnInit() {
   }
 
-  public forgot(){
+  forgot(){
     this.authService.forgotpassword(this.model).subscribe(() => {
       this.alerts.onSuccess('Link do zmiany hasła został wysłany na adres email!');
       this.forgotBool = true;

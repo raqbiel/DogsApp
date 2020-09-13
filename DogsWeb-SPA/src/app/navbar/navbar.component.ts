@@ -29,7 +29,7 @@ export class NavbarComponent implements OnInit {
       this.alerts.onSuccess('Użytkownik zalogowany!');
    }, err => {
      this.alerts.onError(err);
-   }, ()=> {
+   }, () => {
      this.router.navigate(['/dopasowania']);
    });
   }

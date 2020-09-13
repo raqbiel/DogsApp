@@ -1,3 +1,4 @@
+import { DogCardComponent } from './dogs/dog-card/dog-card.component';
 import { appRoutes } from './routes';
 import { Routes, RouterModule } from '@angular/router';
 import { ErrorInterceptorProvider } from './_services/error.interceptor';
@@ -5,6 +6,8 @@ import { AuthService } from './_services/auth.service';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
+import { JwtModule } from '@auth0/angular-jwt';
+
 
 import { AppComponent } from './app.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -23,10 +26,15 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
 import { PushNotificationsModule } from 'ng-push-ivy';
 import { ResetPasswordComponent } from './resetPassword/resetPassword.component';
 import { ForgotPasswordComponent } from './forgotPassword/forgotPassword.component';
-import { DogsListComponent } from './dogs-list/dogs-list.component';
+import { DogsListComponent } from './dogs/dogs-list/dogs-list.component';
 import { ListsComponent } from './lists/lists.component';
 import { MessagesComponent } from './messages/messages.component';
+import { EmailConfirmedComponent } from './emailConfirmed/emailConfirmed.component';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
+export function tokenGetter(){
+  return localStorage.getItem('token');
+}
 
 @NgModule({
   declarations: [
@@ -34,11 +42,13 @@ import { MessagesComponent } from './messages/messages.component';
     NavbarComponent,
     HomeComponent,
     RegisterComponent,
-      ResetPasswordComponent,
-      ForgotPasswordComponent,
-      DogsListComponent,
-      ListsComponent,
-      MessagesComponent
+    ResetPasswordComponent,
+    ForgotPasswordComponent,
+    DogsListComponent,
+    ListsComponent,
+    MessagesComponent,
+    EmailConfirmedComponent,
+    DogCardComponent
    ],
   imports: [
     MatFormFieldModule,
@@ -53,8 +63,15 @@ import { MessagesComponent } from './messages/messages.component';
     BsDropdownModule.forRoot(),
     SimpleNotificationsModule.forRoot(),
     PushNotificationsModule,
-    RouterModule.forRoot(appRoutes)
-
+    RouterModule.forRoot(appRoutes),
+    FontAwesomeModule,
+    JwtModule.forRoot({
+      config: {
+        tokenGetter: tokenGetter,
+        allowedDomains: ['localhost:5000'],
+        disallowedRoutes: ['localhost:5000/api/auth']
+      }
+    })
   ],
   providers: [
     ErrorInterceptorProvider,
