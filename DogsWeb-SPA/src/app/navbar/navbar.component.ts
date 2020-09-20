@@ -16,7 +16,7 @@ export class NavbarComponent implements OnInit {
   hide = true;
   form: FormGroup;
   err: any = {};
-
+  public isCollapsed = false;
 
   constructor(public authService: AuthService, private alerts: AlertsService, private router: Router) { }
 
@@ -30,7 +30,7 @@ export class NavbarComponent implements OnInit {
    }, err => {
      this.alerts.onError(err);
    }, () => {
-     this.router.navigate(['/dopasowania']);
+     this.router.navigate(['/lista']);
    });
   }
 

@@ -1,3 +1,4 @@
+import { ActivatedRoute } from '@angular/router';
 import { User } from '../../_models/user';
 import { AlertsService } from '../../_services/alerts.service';
 import { UserService } from '../../_services/user.service';
@@ -13,17 +14,12 @@ export class DogsListComponent implements OnInit {
 
   users:User[];
 
-  constructor(private userService: UserService, private alert: AlertsService) { }
+  constructor(private userService: UserService, private alert: AlertsService, private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.loadUsers();
-  }
-
-  loadUsers(){
-    this.userService.getUsers().subscribe((users: User[]) => {
-      this.users = users;
-    }, error =>{
-      this.alert.onError(error);
+    this.route.data.subscribe(data =>{
+      this.users = data['users'];
     });
   }
+
 }

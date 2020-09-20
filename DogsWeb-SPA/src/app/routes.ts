@@ -1,3 +1,5 @@
+import { DogListResolver } from './_resolves/dog-list.resolver';
+import { DogDetailResolver } from './_resolves/dog-detail.resolver';
 import { DogDetailsComponent } from './dogs/dog-details/dog-details.component';
 import { EmailConfirmedComponent } from './emailConfirmed/emailConfirmed.component';
 import { AuthGuard } from './_guards/auth.guard';
@@ -15,10 +17,10 @@ export const appRoutes: Routes = [
       runGuardsAndResolvers: 'always',
       canActivate: [AuthGuard],
       children: [
-        { path: 'dopasowania', component: DogsListComponent},
-        { path: 'dopasowania/:id', component: DogDetailsComponent},
+        { path: 'lista', component: DogsListComponent, resolve: { users: DogListResolver}},
+        { path: 'lista/:id', component: DogDetailsComponent, resolve: { user: DogDetailResolver}},
         { path: 'wiadomosci', component: MessagesComponent},
-        { path: 'lista-uzytkownikow', component: ListsComponent},
+        { path: 'dopasowania', component: ListsComponent},
       ]
   },
   { path: 'przypomnij', component: ForgotPasswordComponent},

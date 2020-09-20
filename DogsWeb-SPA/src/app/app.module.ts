@@ -1,13 +1,17 @@
+import { DogListResolver } from './_resolves/dog-list.resolver';
+import { DogDetailResolver } from './_resolves/dog-detail.resolver';
+import { UserService } from './_services/user.service';
+import { AlertsService } from './_services/alerts.service';
+import { DogDetailsComponent } from './dogs/dog-details/dog-details.component';
 import { DogCardComponent } from './dogs/dog-card/dog-card.component';
 import { appRoutes } from './routes';
-import { Routes, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { ErrorInterceptorProvider } from './_services/error.interceptor';
-import { AuthService } from './_services/auth.service';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { JwtModule } from '@auth0/angular-jwt';
-
+import { TabsModule } from 'ngx-bootstrap/tabs';
 
 import { AppComponent } from './app.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -22,6 +26,7 @@ import { HomeComponent } from './home/home.component';
 import { RegisterComponent } from './register/register.component';
 
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+
 import { SimpleNotificationsModule } from 'angular2-notifications';
 import { PushNotificationsModule } from 'ng-push-ivy';
 import { ResetPasswordComponent } from './resetPassword/resetPassword.component';
@@ -31,6 +36,8 @@ import { ListsComponent } from './lists/lists.component';
 import { MessagesComponent } from './messages/messages.component';
 import { EmailConfirmedComponent } from './emailConfirmed/emailConfirmed.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AuthGuard } from './_guards/auth.guard';
+import { NgxGalleryModule } from '@kolkov/ngx-gallery';
 
 export function tokenGetter(){
   return localStorage.getItem('token');
@@ -48,7 +55,8 @@ export function tokenGetter(){
     ListsComponent,
     MessagesComponent,
     EmailConfirmedComponent,
-    DogCardComponent
+    DogCardComponent,
+    DogDetailsComponent
    ],
   imports: [
     MatFormFieldModule,
@@ -60,6 +68,7 @@ export function tokenGetter(){
     FormsModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
+    TabsModule.forRoot(),
     BsDropdownModule.forRoot(),
     SimpleNotificationsModule.forRoot(),
     PushNotificationsModule,
@@ -71,14 +80,21 @@ export function tokenGetter(){
         allowedDomains: ['localhost:5000'],
         disallowedRoutes: ['localhost:5000/api/auth']
       }
-    })
+    }),
+    NgxGalleryModule
   ],
   providers: [
     ErrorInterceptorProvider,
+    AlertsService,
+    AuthGuard,
+    UserService,
+    DogDetailResolver,
+    DogListResolver
 
 
 
   ],
+
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -15,6 +15,7 @@ export class DogCardComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+
   }
 
 }
