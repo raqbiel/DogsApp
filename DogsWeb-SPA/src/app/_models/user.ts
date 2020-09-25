@@ -4,7 +4,7 @@ export interface User {
       id: string;
       userName: string;
       emailConfirmed: number;
-      knownAs?: string;
+      knownAs: string;
       age: number;
       breed: string;
       created: Date;

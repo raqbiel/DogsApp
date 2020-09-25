@@ -1,9 +1,7 @@
-import { DogListResolver } from './_resolves/dog-list.resolver';
-import { DogDetailResolver } from './_resolves/dog-detail.resolver';
+import { PreventUnsavedChanges } from './_guards/prevent-unsaved-changes.guard';
 import { UserService } from './_services/user.service';
 import { AlertsService } from './_services/alerts.service';
-import { DogDetailsComponent } from './dogs/dog-details/dog-details.component';
-import { DogCardComponent } from './dogs/dog-card/dog-card.component';
+
 import { appRoutes } from './routes';
 import { RouterModule } from '@angular/router';
 import { ErrorInterceptorProvider } from './_services/error.interceptor';
@@ -29,15 +27,24 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 
 import { SimpleNotificationsModule } from 'angular2-notifications';
 import { PushNotificationsModule } from 'ng-push-ivy';
-import { ResetPasswordComponent } from './resetPassword/resetPassword.component';
-import { ForgotPasswordComponent } from './forgotPassword/forgotPassword.component';
-import { DogsListComponent } from './dogs/dogs-list/dogs-list.component';
-import { ListsComponent } from './lists/lists.component';
-import { MessagesComponent } from './messages/messages.component';
-import { EmailConfirmedComponent } from './emailConfirmed/emailConfirmed.component';
+
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AuthGuard } from './_guards/auth.guard';
 import { NgxGalleryModule } from '@kolkov/ngx-gallery';
+
+import { DogListResolver } from './_resolves/dog-list.resolver';
+import { DogDetailResolver } from './_resolves/dog-detail.resolver';
+import { DogEditResolver } from './_resolves/dog-edit.resolver';
+
+import { DogEditComponent } from './dogs/dog-edit/dog-edit.component';
+import { DogDetailsComponent } from './dogs/dog-details/dog-details.component';
+import { DogCardComponent } from './dogs/dog-card/dog-card.component';
+import { ResetPasswordComponent } from './resetPassword/resetPassword.component';
+import { ForgotPasswordComponent } from './forgotPassword/forgotPassword.component';
+import { DogListComponent } from './dogs/dog-list/dog-list.component';
+import { ListsComponent } from './lists/lists.component';
+import { MessagesComponent } from './messages/messages.component';
+import { EmailConfirmedComponent } from './emailConfirmed/emailConfirmed.component';
 
 export function tokenGetter(){
   return localStorage.getItem('token');
@@ -51,12 +58,13 @@ export function tokenGetter(){
     RegisterComponent,
     ResetPasswordComponent,
     ForgotPasswordComponent,
-    DogsListComponent,
+    DogListComponent,
     ListsComponent,
     MessagesComponent,
     EmailConfirmedComponent,
     DogCardComponent,
-    DogDetailsComponent
+    DogDetailsComponent,
+    DogEditComponent
    ],
   imports: [
     MatFormFieldModule,
@@ -87,9 +95,11 @@ export function tokenGetter(){
     ErrorInterceptorProvider,
     AlertsService,
     AuthGuard,
+    PreventUnsavedChanges,
     UserService,
     DogDetailResolver,
-    DogListResolver
+    DogListResolver,
+    DogEditResolver
 
 
 

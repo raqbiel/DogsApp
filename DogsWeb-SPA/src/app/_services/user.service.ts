@@ -19,13 +19,16 @@ getUsers(): Observable<User[]> {
 
 }
 getUser(id): Observable<User> {
-  return this.http.get<User>(this.baseUrl + 'users/' + id);
-
-}
+    return this.http.get<User>(this.baseUrl + 'users/' + id);
+  }
 
 confirmEmail(): Observable<User> {
 
   return this.http.get<User>(this.baseUrl + 'users/');
+}
+
+updateUser(id: string, user: User){
+  return this.http.put(this.baseUrl + 'users/' + id, user);
 }
 
 }

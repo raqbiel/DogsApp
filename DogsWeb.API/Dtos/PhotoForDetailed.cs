@@ -1,16 +1,13 @@
 using System;
 
-namespace DogsWeb.API.Models
+namespace DogsWeb.API.Dtos
 {
-    public class Photo
+    public class PhotosForDetailedDto
     {
         public int Id { get; set; }
         public string Url { get; set; }
         public string Description { get; set; }
         public DateTime DateAdded { get; set; }
-        public bool isMain {get; set;}
-        public string PublicId { get; set; }
-
-
+        public bool IsMain { get; set; }
     }
 }

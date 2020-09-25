@@ -17,5 +17,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.7"/>
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.1.7"/>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.7"/>
+    <PackageReference Include="CloudinaryDotNet" Version="1.13.1"/>
   </ItemGroup>
 </Project>

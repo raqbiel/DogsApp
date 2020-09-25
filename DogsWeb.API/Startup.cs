@@ -49,7 +49,9 @@ namespace DogsWeb.API
                 opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
             });
             services.AddCors();
+            services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySettings"));
             services.AddAutoMapper(typeof(DogsRepository).Assembly);
+            services.AddTransient<Seed>();
             services.AddScoped<IDogsRepository, DogsRepository>();
              services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options => 

@@ -13,7 +13,8 @@
 }
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background-image: url('./assets/img/background.png');
+  background-size: auto;}
 
 .tab-panel {
     border: 1px solid #ddd;
@@ -41,7 +42,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
   .dogs-tabset > .nav-tabs > li.active {
     position: relative;
-   
+
   }
 
   .dogs-tabset > .nav-tabs > li.active > a {
@@ -61,3 +62,6 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     border-top: 1px solid #eee;
     padding: 15px 0;
   }
+.tab-panel{
+  background-color: white;
+}

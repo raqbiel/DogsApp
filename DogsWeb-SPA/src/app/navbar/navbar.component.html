@@ -29,11 +29,11 @@
     </div> -->
     <div class="container-fluid">
     <div class="btn-group" role="group" aria-label="Button group with nested dropdown" *ngIf="loggedIn()" class="dropdown" dropdown>
-      <button type="button" class="btn btn-primary" > Witamy, {{authService.decodedToken?.unique_name | titlecase }}</button>
+      <div  class="btn btn-primary" > Witamy, {{authService.decodedToken?.unique_name | titlecase }}</div>
       <div class="btn-group " role="group">
         <button id="btnGroupDrop1" dropdownToggle type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
         <div class="dropdown-menu mt-3" *dropdownMenu>
-          <a class="dropdown-item"><i class="fa fa-user"></i> Edytuj Profil</a>
+          <a class="dropdown-item" [routerLink]="['dog/edit']"><i class="fa fa-user"></i> Edytuj Profil</a>
           <a class="dropdown-item" (click)="logout()"><i class="fa fa-sign-out"></i> Wyloguj</a>
         </div>
       </div>

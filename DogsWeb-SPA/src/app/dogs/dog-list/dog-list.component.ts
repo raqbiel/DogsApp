@@ -6,13 +6,13 @@ import { UserService } from '../../_services/user.service';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-dogs-list',
-  templateUrl: './dogs-list.component.html',
-  styleUrls: ['./dogs-list.component.css']
+  selector: 'app-dog-list',
+  templateUrl: './dog-list.component.html',
+  styleUrls: ['./dog-list.component.css']
 })
-export class DogsListComponent implements OnInit {
+export class DogListComponent implements OnInit {
 
-  users:User[];
+  users: User[];
 
   constructor(private userService: UserService, private alert: AlertsService, private route: ActivatedRoute) { }
 

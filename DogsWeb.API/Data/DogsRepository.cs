@@ -24,9 +24,16 @@ namespace DogsWeb.API.Data
              _context.Remove(entity);
         }
 
-        public async Task<ApplicationUser> GetUser(string username)
+        public async Task<Photo> GetPhoto(int id)
         {
-           var user = await _context.Users.Include(p => p.Photos).FirstOrDefaultAsync(u => u.UserName == username);
+           var photo = await _context.Photos.FirstOrDefaultAsync(p => p.Id == id);
+
+           return photo;
+        }
+
+        public async Task<ApplicationUser> GetUser(string id)
+        {
+           var user = await _context.Users.Include(p => p.Photos).FirstOrDefaultAsync(u => u.Id == id);
 
            return user;
         }

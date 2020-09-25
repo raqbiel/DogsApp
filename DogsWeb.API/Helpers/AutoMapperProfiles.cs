@@ -17,6 +17,13 @@ namespace DogsWeb.API.Helpers
                 .ForMember(dest => dest.PhotoUrl, opt => opt.MapFrom(src => 
                                 src.Photos.FirstOrDefault(p => p.isMain).Url))
                 .ForMember(dest => dest.Age, opt => opt.MapFrom(src => src.DateOfBirth.CalculateAge()));
+            CreateMap<Photo, PhotosForDetailedDto>();
+            CreateMap<UserForUpdate, ApplicationUser>();
+            CreateMap<Photo, PhotoForReturn>();
+            CreateMap<PhotoForCreation, Photo>();
+        
+           
+              
         }
     }
 }

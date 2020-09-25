@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using DogsWeb.API.Data;
@@ -45,5 +47,21 @@ namespace DogsWeb.API.Controllers
             return Ok(userToReturn);
 
         }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser(string id, UserForUpdate userForUpdate){
+
+            if(id != User.FindFirst(ClaimTypes.NameIdentifier).Value)
+                return Unauthorized();
+
+                var userFromRepo = await _repository.GetUser(id);
+
+                _mapper.Map(userForUpdate, userFromRepo); // bierze dane z userupdate i zapisuje do userfromrepo
+
+                if(await _repository.SaveAll())
+                return NoContent();
+
+                throw new Exception($"Aktualizacja user {id} zawiodła podczas zapisu");
+        }
+        
     }
 }
